@@ -1,0 +1,26 @@
+.new-wish {
+	min-height: 100vh;
+	padding: 80px 30px 0px;
+	background-color: #121212;
+}
+
+.remove-icon {
+	padding-left: 10px;
+	cursor: pointer;
+}
+
+.message-div {
+	position: absolute !important;
+	bottom: 10px !important;
+	right: 10px !important;
+}
+
+.input-column {
+	display: flex;
+	flex-direction: column;
+	width: fit-content;
+}
+
+.input-label {
+	color: red;
+}

@@ -1,0 +1,20 @@
+.recently-added {
+	min-height: 100vh;
+	padding: 80px 30px 0px;
+	background-color: #121212;
+}
+
+.wishes-ul {
+	padding-left: 20px !important;
+	margin: 10px 0px !important;
+}
+
+.bucket-list-card-header {
+	display: flex !important;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.bucket-list-column {
+	padding-bottom: 20px;
+}
