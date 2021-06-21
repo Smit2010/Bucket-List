@@ -38,11 +38,15 @@ const RecentlyAdded = ({ type }) => {
 
 	useEffect(() => {
 		if (type === "show-all") {
-			getUserBucketList().then(({ status, data }) => {
-				if (status === 200) {
-					setUserBucketList(data.userBucketList);
-				}
-			});
+			getUserBucketList()
+				.then(({ status, data }) => {
+					if (status === 200) {
+						setUserBucketList(data.userBucketList);
+					}
+				})
+				.catch((err) => {
+					console.error(err);
+				});
 		} else {
 			setUserBucketList(userData);
 		}

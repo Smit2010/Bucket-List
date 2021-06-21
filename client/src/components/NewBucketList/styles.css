@@ -16,9 +16,9 @@
 }
 
 .input-column {
-	display: flex;
+	display: flex !important;
 	flex-direction: column;
-	width: fit-content;
+	width: fit-content !important;
 }
 
 .input-label {

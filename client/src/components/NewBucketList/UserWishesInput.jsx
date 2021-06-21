@@ -16,10 +16,6 @@ const actionButtons = [
 		label: "Submit",
 		name: "submit",
 	},
-	{
-		label: "Save",
-		name: "save",
-	},
 ];
 
 const UserWishesInput = ({ handleMessageVisibility, type }) => {
