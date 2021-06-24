@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Input, Grid, Button, Icon } from "semantic-ui-react";
 import { useDispatch, useSelector } from "react-redux";
 import { submitWishes } from "../../redux/actions";
-import { editUserBucketList, saveUserBucketList } from "../../apis";
+import { editUserBucketList, saveUserBucketList } from "../../apis/apis";
 import { useHistory } from "react-router-dom";
+import ConflictModal from "./ConflictModal";
 
 const { Column, Row } = Grid;
 
@@ -15,6 +16,10 @@ const actionButtons = [
 	{
 		label: "Submit",
 		name: "submit",
+	},
+	{
+		label: "Save",
+		name: "save",
 	},
 ];
 
@@ -29,9 +34,18 @@ const UserWishesInput = ({ handleMessageVisibility, type }) => {
 		{ visited: false, error: false },
 	]);
 	const [submittingWishes, setSubmittingWishes] = useState(false);
+	const [savingWishes, setSavingWishes] = useState(false);
+	const [conflictPopUp, setConflictPopUp] = useState({
+		visible: false,
+		header: "",
+		content: [],
+	});
 	const editWishItem = useSelector((state) => state.userData.editWishItem);
 	const dispatch = useDispatch();
 	const history = useHistory();
+	const userBucketLists = useSelector(
+		(state) => state.userData.userBucketList
+	);
 
 	useEffect(() => {
 		if (type === "edit") {
@@ -48,71 +62,109 @@ const UserWishesInput = ({ handleMessageVisibility, type }) => {
 
 	useEffect(() => {
 		if (submittingWishes) {
+			let temp = userBucketLists.filter((item) => item.name === userName);
+			if (temp.length > 0) {
+				setConflictPopUp({
+					visible: true,
+					header: `Bucket List for "${userName.toUpperCase()}" already exists!`,
+					content: temp,
+					type: "redux",
+				});
+			} else {
+				dispatch(
+					submitWishes({
+						name: userName,
+						wishes: userWishes,
+					})
+				);
+				handleMessageVisibility({
+					type: "success",
+					visible: true,
+					message: "New Bucket List Created!",
+				});
+				resetUserData();
+				setSubmittingWishes(false);
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [submittingWishes]);
+
+	useEffect(() => {
+		if (savingWishes) {
 			if (type !== "edit") {
-				saveUserBucketList({ name: userName, wishes: userWishes })
+				saveUserBucketList(userBucketLists)
 					.then(({ status, data }) => {
-						if (status === 200) {
-							dispatch(
-								submitWishes({
-									name: userName,
-									wishes: userWishes,
-								})
-							);
+						if (data.status === 200) {
 							handleMessageVisibility({
 								type: "success",
 								visible: true,
+								message: "Bucket Lists Saved",
 							});
-							setUserName("");
-							setUserWishes([""]);
+							resetUserData();
+						} else if (data.status === 409) {
+							setConflictPopUp({
+								visible: true,
+								header: `Bucket List already exists!`,
+								content: data.conflictedBucketList,
+								type: "mongodb",
+							});
 						} else {
 							handleMessageVisibility({
-								type: "failure",
+								type: "error",
 								visible: true,
+								message: "Unable to create New Bucket List!",
 							});
 						}
-						setSubmittingWishes(false);
+						setSavingWishes(false);
 					})
 					.catch((err) => {
 						handleMessageVisibility({
-							type: "failure",
+							type: "error",
 							visible: true,
+							message: "Unable to create New Bucket List!",
 						});
 						console.error(err);
-						setSubmittingWishes(false);
+						setSavingWishes(false);
 					});
 			} else {
-				editUserBucketList({
-					itemId: editWishItem.itemId,
-					name: userName,
-					wishes: userWishes,
-				})
+				editUserBucketList(
+					[
+						{
+							itemId: editWishItem.itemId,
+							name: userName,
+							wishes: userWishes,
+						},
+					],
+					"overwrite"
+				)
 					.then(({ status, data }) => {
 						if (status === 200) {
 							handleMessageVisibility(
 								{
 									type: "success",
 									visible: true,
+									message: "Bucket List Updated!",
 								},
 								() => history.push("/new-bucket-list")
 							);
-							setUserName("");
-							setUserWishes([""]);
+							resetUserData();
 						} else {
 							handleMessageVisibility({
-								type: "failure",
+								type: "error",
 								visible: true,
+								message: "Unable to create New Bucket List!",
 							});
 						}
-						setSubmittingWishes(false);
+						setSavingWishes(false);
 					})
 					.catch((err) => {
 						console.error(err);
-						setSubmittingWishes(false);
+						setSavingWishes(false);
 					});
 			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [submittingWishes]);
+	}, [savingWishes]);
 
 	const handleOnClick = (type) => {
 		if (type === "add-more") {
@@ -123,10 +175,13 @@ const UserWishesInput = ({ handleMessageVisibility, type }) => {
 				setSubmittingWishes(true);
 			} else {
 				handleMessageVisibility({
-					type: "invalid",
+					type: "error",
 					visible: true,
+					message: "Enter Valid Details!",
 				});
 			}
+		} else {
+			setSavingWishes(true);
 		}
 	};
 
@@ -159,6 +214,20 @@ const UserWishesInput = ({ handleMessageVisibility, type }) => {
 			error: temp[idx].visited && userWishes[idx].length < 1,
 		};
 		setWishError(temp);
+	};
+
+	const handleModalClose = () => {
+		setConflictPopUp({
+			visible: false,
+			header: "",
+			content: [],
+		});
+		setSubmittingWishes(false);
+	};
+
+	const resetUserData = () => {
+		setUserName("");
+		setUserWishes([""]);
 	};
 
 	return (
@@ -223,7 +292,10 @@ const UserWishesInput = ({ handleMessageVisibility, type }) => {
 						<Button
 							basic
 							inverted
-							loading={item.name === "submit" && submittingWishes}
+							loading={
+								(item.name === "submit" && submittingWishes) ||
+								(item.name === "save" && savingWishes)
+							}
 							onClick={() => handleOnClick(item.name)}
 						>
 							{item.label}
@@ -231,6 +303,13 @@ const UserWishesInput = ({ handleMessageVisibility, type }) => {
 					</Column>
 				))}
 			</Row>
+			<ConflictModal
+				conflictPopUp={conflictPopUp}
+				handleModalClose={handleModalClose}
+				handleMessageVisibility={handleMessageVisibility}
+				userData={{ userName: userName, userWishes: userWishes }}
+				resetUserData={resetUserData}
+			/>
 		</>
 	);
 };

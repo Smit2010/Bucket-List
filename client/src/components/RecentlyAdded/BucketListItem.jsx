@@ -42,7 +42,7 @@ const BucketListItem = ({
 				<Description>
 					{items?.length > 0 &&
 						items.map((userWish, userWishIdx) => (
-							<ul className="wishes-ul">
+							<ul className="wishes-ul" key={userWishIdx}>
 								<li key={userWishIdx}>{userWish}</li>
 							</ul>
 						))}

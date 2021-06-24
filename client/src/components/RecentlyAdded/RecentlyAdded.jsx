@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { Header, Grid } from "semantic-ui-react";
 import { editWish } from "../../redux/actions";
-import { deleteUserBucketList, getUserBucketList } from "../../apis";
+import { deleteUserBucketList, getUserBucketList } from "../../apis/apis";
 import BucketListItem from "./BucketListItem";
 import "./styles.css";
 
@@ -64,7 +64,6 @@ const RecentlyAdded = ({ type }) => {
 					<Grid>
 						<Row columns={6}>
 							{userBucketList.map((item, itemIdx) => {
-								console.log(item);
 								return (
 									<Column
 										key={itemIdx}

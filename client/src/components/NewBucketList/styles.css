@@ -24,3 +24,29 @@
 .input-label {
 	color: red;
 }
+
+.modal-grid {
+	padding: 0px 10px 10px !important;
+	margin: 0px !important;
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.modal-row {
+	padding: 0px !important;
+}
+
+.modal-column {
+	padding-top: 10px !important;
+	padding-bottom: 10px !important;
+}
+
+.modal-div {
+	max-height: 300px;
+	overflow-y: scroll;
+}
+
+.modal-header {
+	margin: 0px !important;
+	padding: 10px 20px !important;
+}

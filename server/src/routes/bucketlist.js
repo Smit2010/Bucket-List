@@ -4,6 +4,10 @@
 
 const express = require("express");
 const { ObjectID } = require("mongodb");
+const {
+	checkAndInsertConflictingBucketLists,
+	updateUserBucketList,
+} = require("../utils/utils");
 //const UserBucketList = require("../models/bucketlist");
 
 const router = new express.Router();
@@ -26,13 +30,29 @@ router.get("/get-bucket-list", async (req, res) => {
 
 router.post("/save-bucket-lists", async (req, res) => {
 	try {
-		let newUserBucketList = req.body.userBucketList;
+		let newUserBucketLists = req.body.userBucketLists;
 		// const newUserBucketListObj = new UserBucketList(newUserBucketList);
 		// await newUserBucketListObj.save();
 		const dbCollection = req.app.db.collection("userbucketlists");
-		await dbCollection.insertOne(newUserBucketList);
-		res.status(200).send("BucketList created successfully!");
+		checkAndInsertConflictingBucketLists(
+			dbCollection,
+			newUserBucketLists
+		).then(async (conflictedBucketList) => {
+			if (conflictedBucketList.length < 1) {
+				//await dbCollection.insertMany(newUserBucketLists);
+				res.status(200).send({
+					message: "BucketList created successfully!",
+					status: 200,
+				});
+			} else {
+				res.status(200).send({
+					conflictedBucketList: conflictedBucketList,
+					status: 409,
+				});
+			}
+		});
 	} catch (error) {
+		console.log(error);
 		res.status(500).send(error);
 	}
 });
@@ -40,18 +60,21 @@ router.post("/save-bucket-lists", async (req, res) => {
 router.post("/edit-bucket-list", async (req, res) => {
 	try {
 		let newUserBucketList = req.body.userBucketList;
+		let updateType = req.body.updateType;
 		// const newUserBucketListObj = new UserBucketList(newUserBucketList);
 		// await newUserBucketListObj.save();
-		const filter = { _id: ObjectID(newUserBucketList.itemId) };
-		const updatedUserBucketList = {
-			$set: {
-				name: newUserBucketList.name,
-				wishes: newUserBucketList.wishes,
-			},
-		};
+
 		const dbCollection = req.app.db.collection("userbucketlists");
-		await dbCollection.updateOne(filter, updatedUserBucketList);
-		res.status(200).send("BucketList updated successfully!");
+		updateUserBucketList(dbCollection, newUserBucketList, updateType)
+			.then((data) => {
+				let message = `${data} Bucket Lists updated successfully!`;
+				res.status(200).send(message);
+			})
+			.catch((err) => {
+				res.status(500).send(error);
+			});
+		//await dbCollection.updateOne(filter, updatedUserBucketList);
+		//res.status(200).send("BucketList updated successfully!");
 	} catch (error) {
 		res.status(500).send(error);
 	}

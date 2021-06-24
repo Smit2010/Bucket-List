@@ -17,6 +17,32 @@ export default function userDataReducer(state = initialState, action) {
 				editWishItem: action.payload,
 			};
 
+		case "OVERWRITE_WISHES":
+			return {
+				...state,
+				userBucketList: state.userBucketList.map((item) =>
+					item.name === action.payload.name
+						? { name: item.name, wishes: action.payload.wishes }
+						: item
+				),
+			};
+
+		case "APPEND_WISHES":
+			return {
+				...state,
+				userBucketList: state.userBucketList.map((item) =>
+					item.name === action.payload.name
+						? {
+								name: item.name,
+								wishes: [
+									...item.wishes,
+									...action.payload.wishes,
+								],
+						  }
+						: item
+				),
+			};
+
 		default:
 			return state;
 	}

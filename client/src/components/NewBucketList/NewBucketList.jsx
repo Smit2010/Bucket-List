@@ -33,38 +33,15 @@ const NewBucketList = ({ type }) => {
 						type={type}
 					/>
 				</Grid>
-				{messageVisibility.visible &&
-					(messageVisibility.type === "success" ? (
-						type === "edit" ? (
-							<Message
-								success
-								compact
-								header="Bucket List Updated!"
-								className="message-div"
-							/>
-						) : (
-							<Message
-								success
-								compact
-								header="New Bucket List Created!"
-								className="message-div"
-							/>
-						)
-					) : messageVisibility.type === "invalid" ? (
-						<Message
-							error
-							compact
-							header="Enter Valid Details!"
-							className="message-div"
-						/>
-					) : (
-						<Message
-							error
-							compact
-							header="Unable to create New Bucket List!"
-							className="message-div"
-						/>
-					))}
+				{messageVisibility.visible && (
+					<Message
+						success={messageVisibility.type === "success"}
+						error={messageVisibility.type === "error"}
+						compact
+						header={messageVisibility.message}
+						className="message-div"
+					/>
+				)}
 			</div>
 		</div>
 	);

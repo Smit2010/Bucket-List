@@ -4,7 +4,7 @@ const serverUrl = "http://127.0.0.1:5000";
 export const saveUserBucketList = async (data) => {
 	return axios
 		.post(`${serverUrl}/save-bucket-lists/`, {
-			userBucketList: data,
+			userBucketLists: data,
 		})
 		.then((res) => {
 			return res;
@@ -25,9 +25,12 @@ export const getUserBucketList = async () => {
 		});
 };
 
-export const editUserBucketList = async (data) => {
+export const editUserBucketList = async (data, updateType) => {
 	return axios
-		.post(`${serverUrl}/edit-bucket-list/`, { userBucketList: data })
+		.post(`${serverUrl}/edit-bucket-list/`, {
+			userBucketList: data,
+			updateType: updateType,
+		})
 		.then((res) => {
 			return res;
 		})
