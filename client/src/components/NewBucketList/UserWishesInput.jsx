@@ -258,8 +258,9 @@ const UserWishesInput = ({ handleMessageVisibility, type }) => {
 			{userWishes.map((item, itemIdx) => (
 				<Row key={itemIdx}>
 					<Column className="input-column">
-						<div>
+						<div className="wishes-row">
 							<Input
+								className="wishes-input"
 								placeholder="Enter Your Wish"
 								value={item}
 								inverted
@@ -269,6 +270,7 @@ const UserWishesInput = ({ handleMessageVisibility, type }) => {
 								}
 								onFocus={(e) => handleFocusChange(itemIdx)}
 								onBlur={(e) => handleBlurChange(itemIdx)}
+								style={{ width: "100%" }}
 							/>
 							{itemIdx > 0 && (
 								<Icon
@@ -288,7 +290,7 @@ const UserWishesInput = ({ handleMessageVisibility, type }) => {
 			))}
 			<Row>
 				{actionButtons.map((item, itemIdx) => (
-					<Column className="action-button" key={itemIdx}>
+					<Column className="wishes-button" key={itemIdx}>
 						<Button
 							basic
 							inverted

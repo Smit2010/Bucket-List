@@ -61,8 +61,8 @@ const RecentlyAdded = ({ type }) => {
 						: "All Bucket Lists"}
 				</Header>
 				{userBucketList?.length > 0 ? (
-					<Grid>
-						<Row columns={6}>
+					<Grid className="recently-added-grid">
+						<Row columns={4}>
 							{userBucketList.map((item, itemIdx) => {
 								return (
 									<Column

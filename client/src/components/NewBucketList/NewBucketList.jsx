@@ -27,7 +27,7 @@ const NewBucketList = ({ type }) => {
 				<Header as="h1" inverted>
 					Create New Bucket List
 				</Header>
-				<Grid>
+				<Grid className="new-wish-grid">
 					<UserWishesInput
 						handleMessageVisibility={handleMessageVisibility}
 						type={type}
